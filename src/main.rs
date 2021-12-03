@@ -10,8 +10,7 @@ fn main() {
     let result = match problem {
         "day1" => day_1(),
         "day2" => day_2(),
-        // "day2b" => day2b(),
-        // "day3a" => day3a(),
+        "day3" => day_3(),
         // "day3b" => day3b(),
         // "day4a" => day4a(),
         // "day4b" => day4b(),
