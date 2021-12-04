@@ -2,6 +2,7 @@ use aoc2021::{
     day1::day_1,
     day2::day_2,
     day3::day_3,
+    day4::day_4,
 };
 
 fn main() {
@@ -11,8 +12,7 @@ fn main() {
         "day1" => day_1(),
         "day2" => day_2(),
         "day3" => day_3(),
-        // "day3b" => day3b(),
-        // "day4a" => day4a(),
+        "day4" => day_4(),
         // "day4b" => day4b(),
         // "day5a" => day5a(),
         // "day5b" => day5b(),
