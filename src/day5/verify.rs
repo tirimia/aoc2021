@@ -1,4 +1,23 @@
-456,846 -> 221,846
+#[cfg(test)]
+mod tests {
+    use crate::day5::{
+        day5a,
+        day5b,
+        input_to_lines,
+    };
+
+    const RAW_TEST_INPUT: &str = r"0,9 -> 5,9
+8,0 -> 0,8
+9,4 -> 3,4
+2,2 -> 2,1
+7,0 -> 7,4
+6,4 -> 2,0
+0,9 -> 2,9
+3,4 -> 1,4
+0,0 -> 8,8
+5,5 -> 8,2";
+
+    const RAW_INPUT: &str = r"456,846 -> 221,846
 980,926 -> 73,19
 682,930 -> 562,930
 766,592 -> 274,100
@@ -497,4 +516,14 @@
 14,989 -> 988,15
 139,181 -> 139,451
 598,636 -> 598,442
-263,42 -> 686,465
+263,42 -> 686,465";
+
+    #[test]
+    fn day5a_example() { assert_eq!(day5a(input_to_lines(RAW_TEST_INPUT)), 5) }
+    #[test]
+    fn day5b_example() { assert_eq!(day5b(input_to_lines(RAW_TEST_INPUT)), 12) }
+    #[test]
+    fn day5a_real() { assert_eq!(day5a(input_to_lines(RAW_INPUT)), 5280) }
+    #[test]
+    fn day5b_real() { assert_eq!(day5b(input_to_lines(RAW_INPUT)), 16716) }
+}

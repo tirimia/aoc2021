@@ -1,34 +1,26 @@
-// MAYBE: move from go method to AddAssign
+mod verify;
 use std::str::FromStr;
 
-use crate::read_lines;
-
-pub fn day_2() -> String {
-    let input: Vec<Move> = read_lines("assets/day2.input")
-        .iter()
-        .map(|l| Move::from_str(l).unwrap())
-        .collect();
-    format!("Part 1: {}\nPart 2: {}", day2a(input.clone()), day2b(input))
-}
-
-/// 1714680
-fn day2a(moves: Vec<Move>) -> usize {
+fn day2_base<S: Submarine>(moves: Vec<Move>, sub: S) -> usize {
     moves
         .iter()
-        .fold(SubmarinePartA::default(), |final_pos, step| {
-            final_pos.go(*step)
-        })
+        .fold(sub, |final_pos, step| final_pos.go(*step))
         .final_position()
 }
 
-/// 1963088820
-fn day2b(moves: Vec<Move>) -> usize {
-    moves
+pub fn day2a(moves: Vec<Move>) -> usize {
+    day2_base(moves, SubmarinePartA::default())
+}
+
+pub fn day2b(moves: Vec<Move>) -> usize {
+    day2_base(moves, SubmarinePartB::default())
+}
+
+pub fn parse_moves<S: AsRef<str>>(input: &[S]) -> Vec<Move> {
+    input
         .iter()
-        .fold(SubmarinePartB::default(), |final_pos, step| {
-            final_pos.go(*step)
-        })
-        .final_position()
+        .map(|instr| Move::from_str(instr.as_ref()).unwrap())
+        .collect()
 }
 
 trait Submarine {
@@ -80,7 +72,7 @@ struct SubmarinePartB {
 }
 
 #[derive(Clone, Copy)]
-struct Move {
+pub struct Move {
     direction: Direction,
     steps: usize,
 }
@@ -118,7 +110,7 @@ impl FromStr for Direction {
 }
 
 #[derive(Debug)]
-enum Day2Error {
+pub enum Day2Error {
     DirectionParseError(String),
     StepParseError(String),
 }

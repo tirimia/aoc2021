@@ -1,17 +1,7 @@
-/// Pure garbage, _maybe_ refactor at a later date
-use crate::read_lines;
-
-pub fn day_4() -> String {
-    let input = read_lines("assets/day4.input");
-    format!(
-        "Part 1: {}\nPart 2: {}",
-        day4a(&mut Game::new(input.clone())),
-        day4b(Game::new(input))
-    )
-}
+mod verify;
 
 #[derive(Debug)]
-struct Game {
+pub struct Game {
     numbers: Vec<usize>,
     boards: Vec<Board>,
 }
@@ -87,7 +77,9 @@ impl Board {
 }
 
 impl Game {
-    fn new(input: Vec<String>) -> Self {
+    pub fn new(raw_input: &str) -> Self {
+        let input: Vec<String> =
+            raw_input.split('\n').map(String::from).collect();
         let numbers = input
             .first()
             .unwrap()
@@ -107,8 +99,7 @@ impl Game {
     }
 }
 
-/// 31424
-fn day4a(game: &mut Game) -> usize {
+pub fn day4a(game: &mut Game) -> usize {
     for num in game.numbers.clone() {
         for idx in 0..game.boards.len() {
             let score = game.boards[idx].mark(num);
@@ -120,8 +111,7 @@ fn day4a(game: &mut Game) -> usize {
     0usize
 }
 
-/// 23042
-fn day4b(game: Game) -> usize {
+pub fn day4b(game: Game) -> usize {
     let mut boards = game.boards;
     let mut nums = game.numbers.iter();
     while boards.len() > 1 {
@@ -143,44 +133,4 @@ fn day4b(game: Game) -> usize {
         boards,
     };
     day4a(&mut final_game)
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::day4::{
-        day4a,
-        day4b,
-        Game,
-    };
-
-    const RAW_INPUT: &str = r"7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
-
-22 13 17 11  0
- 8  2 23  4 24
-21  9 14 16  7
- 6 10  3 18  5
- 1 12 20 15 19
-
- 3 15  0  2 22
- 9 18 13 17  5
-19  8  7 25 23
-20 11 10 24  4
-14 21 16 12  6
-
-14 21 17 24  4
-10 16 15  9 19
-18  8 23 26 20
-22 11 13  6  5
- 2  0 12  3  7";
-
-    #[test]
-    fn day4a_example() {
-        let input = RAW_INPUT.split('\n').map(String::from).collect();
-        assert_eq!(day4a(&mut Game::new(input)), 4512)
-    }
-    #[test]
-    fn day4b_example() {
-        let input = RAW_INPUT.split('\n').map(String::from).collect();
-        assert_eq!(day4b(Game::new(input)), 1924)
-    }
 }

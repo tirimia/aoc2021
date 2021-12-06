@@ -1,3 +1,4 @@
+mod verify;
 use std::{
     cmp::{
         max,
@@ -6,14 +7,7 @@ use std::{
     collections::HashMap,
     str::FromStr,
 };
-
-pub fn day_5() -> String {
-    let input: Vec<Line> =
-        input_to_lines(&std::fs::read_to_string("assets/day5.input").unwrap());
-    format!("Part 1: {}\nPart 2: {}", day5a(input.clone()), day5b(input))
-}
-
-fn input_to_lines(input: &str) -> Vec<Line> {
+pub fn input_to_lines(input: &str) -> Vec<Line> {
     input
         .split('\n')
         .filter_map(|s| s.parse::<String>().ok())
@@ -22,7 +16,7 @@ fn input_to_lines(input: &str) -> Vec<Line> {
 }
 
 #[derive(Debug, Clone)]
-struct Line {
+pub struct Line {
     x0: isize,
     x1: isize,
     y0: isize,
@@ -91,33 +85,6 @@ fn day5_base(lines: Vec<Line>, diagonals_included: bool) -> usize {
         .count()
 }
 
-/// 5280
-fn day5a(lines: Vec<Line>) -> usize { day5_base(lines, false) }
+pub fn day5a(lines: Vec<Line>) -> usize { day5_base(lines, false) }
 
-/// 16716
-fn day5b(lines: Vec<Line>) -> usize { day5_base(lines, true) }
-
-#[cfg(test)]
-mod tests {
-    use crate::day5::{
-        day5a,
-        day5b,
-        input_to_lines,
-    };
-
-    const RAW_INPUT: &str = r"0,9 -> 5,9
-8,0 -> 0,8
-9,4 -> 3,4
-2,2 -> 2,1
-7,0 -> 7,4
-6,4 -> 2,0
-0,9 -> 2,9
-3,4 -> 1,4
-0,0 -> 8,8
-5,5 -> 8,2";
-
-    #[test]
-    fn day5a_example() { assert_eq!(day5a(input_to_lines(RAW_INPUT)), 5) }
-    #[test]
-    fn day5b_example() { assert_eq!(day5b(input_to_lines(RAW_INPUT)), 12) }
-}
+pub fn day5b(lines: Vec<Line>) -> usize { day5_base(lines, true) }
