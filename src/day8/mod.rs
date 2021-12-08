@@ -50,71 +50,78 @@ pub fn day8a(readings: Vec<Reading>) -> usize {
 }
 
 pub fn day8b(readings: Vec<Reading>) -> usize {
-    let mut result = 0usize;
-    for reading in readings {
-        let four = reading
-            .signals
-            .iter()
-            .find(|r| r.len() == 4)
-            .unwrap()
-            .to_string()
-            .chars()
-            .collect::<Vec<char>>();
-        let mut counts = HashMap::new();
-        for c in reading.signals.iter().flat_map(|s| s.chars()) {
-            *counts.entry(c).or_insert(0usize) += 1;
-        }
-        let mut mapping: [char; 7] = [' '; 7];
-        mapping[2] = *counts
-            .iter()
-            .filter(|(_, v)| **v == 9)
-            .map(|(k, _)| k)
-            .next()
-            .unwrap();
-        mapping[4] = *counts
-            .iter()
-            .filter(|(_, v)| **v == 4)
-            .map(|(k, _)| k)
-            .next()
-            .unwrap();
-        mapping[5] = *counts
-            .iter()
-            .filter(|(_, v)| **v == 6)
-            .map(|(k, _)| k)
-            .next()
-            .unwrap();
-        let sevens = counts
-            .iter()
-            .filter(|(_, v)| **v == 7)
-            .map(|(k, _)| *k);
-        let eights = counts
-            .iter()
-            .filter(|(_, v)| **v == 8)
-            .map(|(k, _)| *k);
-        for seven in sevens {
-            if four.contains(&seven) {
-                mapping[6] = seven;
-            } else {
-                mapping[3] = seven;
-            }
-        }
-        for eight in eights {
-            if four.contains(&eight) {
-                mapping[1] = eight;
-            } else {
-                mapping[0] = eight;
-            }
-        }
+    readings
+        .into_iter()
+        .map(|reading| {
+            // TODO: learn how to actually wrangle the borrow checker,
+            // this makes the test suite report 0.03 seconds compared
+            // to the naive method 0.02
+            let signals = reading.signals;
+            reading
+                .output
+                .iter()
+                .map(|out| out.as_digit(demistify(signals.clone())))
+                .zip([1000, 100, 10, 1usize].iter())
+                .map(|(digit, factor)| digit * *factor)
+                .sum::<usize>()
+        })
+        .sum()
+}
 
-        result += reading
-            .output
-            .iter()
-            .map(|signal| signal.as_digit(mapping))
-            .zip([1000, 100, 10, 1usize].iter())
-            .map(|(digit, factor)| digit * *factor)
-            .sum::<usize>();
+fn demistify(signals: Vec<String>) -> [char; 7] {
+    let four = signals
+        .iter()
+        .find(|r| r.len() == 4)
+        .unwrap()
+        .to_string()
+        .chars()
+        .collect::<Vec<char>>();
+    let mut counts = HashMap::new();
+    for c in signals.iter().flat_map(|s| s.chars()) {
+        *counts.entry(c).or_insert(0usize) += 1;
     }
-    result
+    let mut mapping: [char; 7] = [' '; 7];
+    mapping[2] = *counts
+        .iter()
+        .filter(|(_, v)| **v == 9)
+        .map(|(k, _)| k)
+        .next()
+        .unwrap();
+    mapping[4] = *counts
+        .iter()
+        .filter(|(_, v)| **v == 4)
+        .map(|(k, _)| k)
+        .next()
+        .unwrap();
+    mapping[5] = *counts
+        .iter()
+        .filter(|(_, v)| **v == 6)
+        .map(|(k, _)| k)
+        .next()
+        .unwrap();
+    let sevens = counts
+        .iter()
+        .filter(|(_, v)| **v == 7)
+        .map(|(k, _)| *k);
+    let eights = counts
+        .iter()
+        .filter(|(_, v)| **v == 8)
+        .map(|(k, _)| *k);
+    for seven in sevens {
+        if four.contains(&seven) {
+            mapping[6] = seven;
+        } else {
+            mapping[3] = seven;
+        }
+    }
+    for eight in eights {
+        if four.contains(&eight) {
+            mapping[1] = eight;
+        } else {
+            mapping[0] = eight;
+        }
+    }
+    mapping
 }
 
 pub trait Digify {
