@@ -1,5 +1,10 @@
+#![allow(clippy::many_single_char_names)]
 mod verify;
-use std::str::FromStr;
+use std::{
+    collections::HashSet,
+    iter::FromIterator,
+    str::FromStr,
+};
 
 pub fn input_to_readings(input: &str) -> Vec<Reading> {
     input
@@ -50,121 +55,124 @@ pub fn day8a(readings: Vec<Reading>) -> usize {
 pub fn day8b(readings: Vec<Reading>) -> usize {
     let mut result = 0usize;
     for reading in readings {
-        let mut known = vec!["".to_string(); 10];
-        known[1] = reading
+        let mut segments: [char; 10] = [' '; 10];
+        let one = reading
             .signals
             .iter()
             .find(|r| r.len() == 2)
             .unwrap()
             .to_string();
-        known[4] = reading
+        let four = reading
             .signals
             .iter()
             .find(|r| r.len() == 4)
             .unwrap()
             .to_string();
-        known[7] = reading
+        let seven = reading
             .signals
             .iter()
             .find(|r| r.len() == 3)
             .unwrap()
             .to_string();
-        known[8] = reading
+        let eight = reading
             .signals
             .iter()
             .find(|r| r.len() == 7)
             .unwrap()
             .to_string();
-        known[6] = reading
+        let two_three_five: Vec<String> = reading
             .signals
             .iter()
-            .filter(|s| s.len() == 6)
-            .filter(|s| {
-                s.chars()
-                    .into_iter()
-                    .any(|c| !known[1].contains(c))
-                    && !s
-                        .chars()
-                        .into_iter()
-                        .all(|c| !known[1].contains(c))
-            })
-            .find(|_| true)
-            .unwrap()
-            .to_string();
-        dbg!(&known);
-        dbg!(&reading.signals);
-        known[0] = reading
+            .filter(|r| r.len() == 5)
+            .map(|r| r.to_owned())
+            .collect();
+        let zero_six_nine: Vec<String> = reading
             .signals
             .iter()
-            .filter(|s| s.len() == 6)
-            .filter(|s| {
-                s.chars()
-                    .into_iter()
-                    .any(|c| !known[4].contains(c))
-            })
-            .filter(|s| !known.contains(s))
-            .find(|_| true)
-            .unwrap()
-            .to_string();
-        // .collect::<Vec<String>>()[0];
-        known[9] = reading
-            .signals
-            .iter()
-            .filter(|s| s.len() == 6)
-            .filter(|s| !known.contains(s))
-            .find(|_| true)
-            .unwrap()
-            .to_string();
-        // .collect::<Vec<String>>()[0];
-        known[5] = reading
-            .signals
-            .iter()
-            .filter(|s| s.len() == 5)
-            .filter(|s| {
-                s.chars()
-                    .into_iter()
-                    .all(|c| known[6].contains(c))
-            })
-            .find(|_| true)
-            .unwrap()
-            .to_string();
-        dbg!(&known);
-        dbg!(&reading.signals);
-        known[3] = reading
-            .signals
-            .iter()
-            .filter(|s| s.len() == 5)
-            .filter(|s| {
-                s.chars()
-                    .into_iter()
-                    .all(|c| known[9].contains(c))
-            })
-            .filter(|s| !known.contains(s))
-            .find(|_| true)
-            .unwrap()
-            .to_string();
-        known[2] = reading
-            .signals
-            .iter()
-            .filter(|s| s.len() == 5)
-            .filter(|s| !known.contains(s))
-            .find(|_| true)
-            .unwrap()
-            .to_string();
-        dbg!(&known);
-        dbg!(&reading.signals);
-        result += reading
-            .output
+            .filter(|r| r.len() == 6)
+            .map(|r| r.to_owned())
+            .collect();
+        let a = seven.but_not_in(&one);
+        let b_d = four.but_not_in(&one);
+        let e_g = eight
+            .but_not_in(&four)
             .into_iter()
-            .map(|s| {
-                known
-                    .iter()
-                    .position(|item| **item == String::from_str(&s).unwrap())
-                    .unwrap()
-            })
-            .zip([1000, 100, 10, 1usize].iter())
-            .map(|(digit, factor)| digit * *factor)
-            .sum::<usize>();
+            .collect::<String>()
+            .but_not_in(&seven)
+            .into_iter()
+            .collect::<String>();
+        let a_d_g = two_three_five[0]
+            .but_not_in(&two_three_five[1])
+            .into_iter()
+            .collect::<String>()
+            .but_not_in(&two_three_five[2])
+            .into_iter()
+            .collect::<String>();
+        let a_b_f_g = zero_six_nine[0]
+            .but_not_in(&zero_six_nine[1])
+            .into_iter()
+            .collect::<String>()
+            .but_not_in(&zero_six_nine[2])
+            .into_iter()
+            .collect::<String>();
+        let g = a_d_g
+            .but_not_in(&a.clone().into_iter().collect())
+            .into_iter()
+            .collect::<String>()
+            .but_not_in(&b_d.clone().into_iter().collect())
+            .into_iter()
+            .collect::<String>();
+        dbg!(&g);
+        let e: String = e_g.but_not_in(&g).into_iter().collect();
+        dbg!(&e);
+        let d = a_d_g
+            .but_not_in(&g)
+            .into_iter()
+            .collect::<String>()
+            .but_not_in(&a.clone().into_iter().collect())
+            .into_iter()
+            .collect();
+        dbg!(&d);
+        let b = b_d
+            .clone()
+            .into_iter()
+            .collect::<String>()
+            .but_not_in(&d);
+        dbg!(&b);
+        let f = a_b_f_g
+            .but_not_in(&a.clone().into_iter().collect())
+            .into_iter()
+            .collect::<String>()
+            .but_not_in(&b.clone().into_iter().collect())
+            .into_iter()
+            .collect::<String>()
+            .but_not_in(&g);
+        dbg!(&f);
+        let c = one.but_not_in(&f.clone().into_iter().collect());
+        dbg!(&c);
+
+        let indexes: [char; 7] = [
+            a[0],
+            b[0],
+            c[0],
+            d.chars().next().unwrap(),
+            e.chars().next().unwrap(),
+            f[0],
+            g.chars().next().unwrap(),
+        ];
+        dbg!(indexes);
+        // result += reading
+        //     .output
+        //     .into_iter()
+        //     .map(|s| {
+        //         known
+        //             .iter()
+        //             .position(|item| **item == String::from_str(&s).unwrap())
+        //             .unwrap()
+        //     })
+        //     .zip([1000, 100, 10, 1usize].iter())
+        //     .map(|(digit, factor)| digit * *factor)
+        //     .sum::<usize>();
         // result += reading.output.iter().map(|signal| signal.as_digit(known)).zip([1000,100,10,1usize].iter()).map(|(digit, factor)| digit * *factor).sum::<usize>();
     }
     result
