@@ -1,8 +1,6 @@
-#![allow(clippy::many_single_char_names)]
 mod verify;
 use std::{
-    collections::HashSet,
-    iter::FromIterator,
+    collections::HashMap,
     str::FromStr,
 };
 
@@ -28,12 +26,12 @@ impl FromStr for Reading {
         let signals: Vec<String> = parts[0]
             .trim()
             .split(' ')
-            .map(|sig| sig.parse::<String>().unwrap().sort())
+            .map(|sig| sig.parse::<String>().unwrap())
             .collect();
         let output: Vec<String> = parts[1]
             .trim()
             .split(' ')
-            .map(|sig| sig.parse::<String>().unwrap().sort())
+            .map(|sig| sig.parse::<String>().unwrap())
             .collect();
         Ok(Self { signals, output })
     }
@@ -51,151 +49,79 @@ pub fn day8a(readings: Vec<Reading>) -> usize {
         .sum()
 }
 
-/// There is a brute force solution out there, but hell naw
 pub fn day8b(readings: Vec<Reading>) -> usize {
     let mut result = 0usize;
     for reading in readings {
-        let mut segments: [char; 10] = [' '; 10];
-        let one = reading
-            .signals
-            .iter()
-            .find(|r| r.len() == 2)
-            .unwrap()
-            .to_string();
         let four = reading
             .signals
             .iter()
             .find(|r| r.len() == 4)
             .unwrap()
-            .to_string();
-        let seven = reading
-            .signals
+            .to_string()
+            .chars()
+            .collect::<Vec<char>>();
+        let mut counts = HashMap::new();
+        for c in reading.signals.iter().flat_map(|s| s.chars()) {
+            *counts.entry(c).or_insert(0usize) += 1;
+        }
+        let mut mapping: [char; 7] = [' '; 7];
+        mapping[2] = *counts
             .iter()
-            .find(|r| r.len() == 3)
-            .unwrap()
-            .to_string();
-        let eight = reading
-            .signals
+            .filter(|(_, v)| **v == 9)
+            .map(|(k, _)| k)
+            .next()
+            .unwrap();
+        mapping[4] = *counts
             .iter()
-            .find(|r| r.len() == 7)
-            .unwrap()
-            .to_string();
-        let two_three_five: Vec<String> = reading
-            .signals
+            .filter(|(_, v)| **v == 4)
+            .map(|(k, _)| k)
+            .next()
+            .unwrap();
+        mapping[5] = *counts
             .iter()
-            .filter(|r| r.len() == 5)
-            .map(|r| r.to_owned())
-            .collect();
-        let zero_six_nine: Vec<String> = reading
-            .signals
+            .filter(|(_, v)| **v == 6)
+            .map(|(k, _)| k)
+            .next()
+            .unwrap();
+        let sevens = counts
             .iter()
-            .filter(|r| r.len() == 6)
-            .map(|r| r.to_owned())
-            .collect();
-        let a = seven.but_not_in(&one);
-        let b_d = four.but_not_in(&one);
-        let e_g = eight
-            .but_not_in(&four)
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&seven)
-            .into_iter()
-            .collect::<String>();
-        let a_d_g = two_three_five[0]
-            .but_not_in(&two_three_five[1])
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&two_three_five[2])
-            .into_iter()
-            .collect::<String>();
-        let a_b_f_g = zero_six_nine[0]
-            .but_not_in(&zero_six_nine[1])
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&zero_six_nine[2])
-            .into_iter()
-            .collect::<String>();
-        let g = a_d_g
-            .but_not_in(&a.clone().into_iter().collect())
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&b_d.clone().into_iter().collect())
-            .into_iter()
-            .collect::<String>();
-        dbg!(&g);
-        let e: String = e_g.but_not_in(&g).into_iter().collect();
-        dbg!(&e);
-        let d = a_d_g
-            .but_not_in(&g)
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&a.clone().into_iter().collect())
-            .into_iter()
-            .collect();
-        dbg!(&d);
-        let b = b_d
-            .clone()
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&d);
-        dbg!(&b);
-        let f = a_b_f_g
-            .but_not_in(&a.clone().into_iter().collect())
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&b.clone().into_iter().collect())
-            .into_iter()
-            .collect::<String>()
-            .but_not_in(&g);
-        dbg!(&f);
-        let c = one.but_not_in(&f.clone().into_iter().collect());
-        dbg!(&c);
+            .filter(|(_, v)| **v == 7)
+            .map(|(k, _)| *k);
+        let eights = counts
+            .iter()
+            .filter(|(_, v)| **v == 8)
+            .map(|(k, _)| *k);
+        for seven in sevens {
+            if four.contains(&seven) {
+                mapping[6] = seven;
+            } else {
+                mapping[3] = seven;
+            }
+        }
+        for eight in eights {
+            if four.contains(&eight) {
+                mapping[1] = eight;
+            } else {
+                mapping[0] = eight;
+            }
+        }
 
-        let indexes: [char; 7] = [
-            a[0],
-            b[0],
-            c[0],
-            d.chars().next().unwrap(),
-            e.chars().next().unwrap(),
-            f[0],
-            g.chars().next().unwrap(),
-        ];
-        dbg!(indexes);
-        // result += reading
-        //     .output
-        //     .into_iter()
-        //     .map(|s| {
-        //         known
-        //             .iter()
-        //             .position(|item| **item == String::from_str(&s).unwrap())
-        //             .unwrap()
-        //     })
-        //     .zip([1000, 100, 10, 1usize].iter())
-        //     .map(|(digit, factor)| digit * *factor)
-        //     .sum::<usize>();
-        // result += reading.output.iter().map(|signal| signal.as_digit(known)).zip([1000,100,10,1usize].iter()).map(|(digit, factor)| digit * *factor).sum::<usize>();
+        result += reading
+            .output
+            .iter()
+            .map(|signal| signal.as_digit(mapping))
+            .zip([1000, 100, 10, 1usize].iter())
+            .map(|(digit, factor)| digit * *factor)
+            .sum::<usize>();
     }
     result
 }
 
-pub trait Deduce {
-    fn but_not_in(&self, other: &Self) -> Vec<char>;
+pub trait Digify {
     fn as_digit(&self, bits: [char; 7]) -> usize;
-    fn sort(&self) -> Self;
 }
 
-impl Deduce for String {
-    fn sort(&self) -> Self {
-        let mut chars: Vec<_> = self.chars().collect();
-        chars.sort_unstable();
-        chars.into_iter().collect()
-    }
-    fn but_not_in(&self, other: &Self) -> Vec<char> {
-        self.chars()
-            .filter(|c| !other.contains(*c))
-            .collect()
-    }
-
+impl Digify for String {
     fn as_digit(&self, bits: [char; 7]) -> usize {
         let bits_set: Vec<usize> = self
             .chars()

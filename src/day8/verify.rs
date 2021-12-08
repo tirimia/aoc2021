@@ -4,7 +4,6 @@ mod tests {
         day8a,
         day8b,
         input_to_readings,
-        Deduce,
     };
 
     const RAW_TEST_INPUT: &str = r"be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
@@ -225,33 +224,18 @@ bea gebfd edfbacg egcdfa ab dagec dgeba dcab abcdge cgeabf | acdbge ba gecafd df
     }
 
     #[test]
-    fn day8b_other_simple_example() {
-        let simple_input = r"ecgabd fb bedca beacfd gfcbead fgaed dbf cfeb bedaf cbgadf | abedc dabfe bcfead cedfgba";
-        // let simple_input = r"edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc";
+    fn day8b_simple_example() {
+        let simple_input = r"acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
         assert_eq!(day8b(input_to_readings(simple_input)), 5353)
     }
 
-    // #[test]
-    // fn day8b_simple_example() {
-    //     let simple_input = r"acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
-    //     assert_eq!(day8b(input_to_readings(simple_input)), 5353)
-    // }
-
-    // #[test]
-    // fn day8b_example() {
-    //     assert_eq!(day8b(input_to_readings(RAW_TEST_INPUT)), 61229)
-    // }
-
     #[test]
-    fn but_not_in_test() {
-        assert_eq!(
-            "abc".to_string().but_not_in(&"bcd".to_string()),
-            ['a'].to_vec()
-        )
+    fn day8b_example() {
+        assert_eq!(day8b(input_to_readings(RAW_TEST_INPUT)), 61229)
     }
 
     #[test]
     fn day8a_real() { assert_eq!(day8a(input_to_readings(RAW_INPUT)), 349) }
-    // #[test]
-    // fn day8b_real() { assert_eq!(day8b(input_to_lines(RAW_INPUT)), 16716) }
+    #[test]
+    fn day8b_real() { assert_eq!(day8b(input_to_readings(RAW_INPUT)), 1070957) }
 }
