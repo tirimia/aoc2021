@@ -27,11 +27,11 @@ pub fn input_to_coords(input: &str) -> HeightMap {
     map
 }
 
-fn get_potential_neighbors(point: Coords) -> Vec<Coords> {
+fn get_neighbors(point: Coords) -> Vec<Coords> {
     let mut neighbors = vec![];
     for dx in -1..=1 {
         for dy in -1..=1 {
-            if (dx == 0 && 0 == dy) | (dx == dy) {
+            if (dx == 0 && 0 == dy) | (dx == dy) | (dx == -dy) {
                 continue;
             }
             let final_x = point.0 as isize + dx;
@@ -49,7 +49,7 @@ fn get_lowest_points(heightmap: HeightMap) -> Points {
     heightmap
         .iter()
         .filter(|(point, val)| {
-            get_potential_neighbors(**point)
+            get_neighbors(**point)
                 .into_iter()
                 .filter_map(|p| heightmap.get(&p))
                 .all(|v| v > val)
@@ -59,13 +59,8 @@ fn get_lowest_points(heightmap: HeightMap) -> Points {
 }
 
 fn get_non_walls_around(point: Coords, heightmap: &HeightMap) -> Vec<Coords> {
-    get_potential_neighbors(point)
+    get_neighbors(point)
         .into_iter()
-	// For some goddamn reason, I had to add this filter, even tho I have the dx dy check above
-        .filter(|p| {
-            (std::cmp::max(p.0, point.0) - std::cmp::min(p.0, point.0))
-                != (std::cmp::max(p.1, point.1) - std::cmp::min(p.1, point.1))
-        })
         .filter(|p| *heightmap.get(p).unwrap_or(&9usize) != 9)
         .collect()
 }
@@ -78,8 +73,6 @@ pub fn day9a(heightmap: HeightMap) -> usize {
 }
 
 pub fn day9b(heightmap: HeightMap) -> usize {
-    // Keep asking for more, use filter_map
-    // get everything , stop at 9s
     let mut basins: Vec<Vec<Coords>> = vec![];
     let seeds: Vec<Coords> = get_lowest_points(heightmap.clone())
         .into_iter()
@@ -90,7 +83,6 @@ pub fn day9b(heightmap: HeightMap) -> usize {
         current_basin.insert(lowest);
         let mut last_size = current_basin.len();
         loop {
-            // Maybe insert until all negative
             for coord in &current_basin.clone() {
                 for neighbor in get_non_walls_around(*coord, &heightmap) {
                     current_basin.insert(neighbor);
