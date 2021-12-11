@@ -3,7 +3,6 @@ mod tests {
     use crate::day11::{
         day11a,
         day11b,
-        input_to_octopi,
     };
 
     const RAW_TEST_INPUT: &str = r"5483143223
@@ -29,17 +28,11 @@ mod tests {
 4885323138";
 
     #[test]
-    fn day11a_example() {
-        assert_eq!(day11a(input_to_octopi(RAW_TEST_INPUT), 100), 1656)
-    }
+    fn day11a_example() { assert_eq!(day11a(RAW_TEST_INPUT, 100), 1656) }
     #[test]
-    fn day11b_example() {
-        assert_eq!(day11b(input_to_octopi(RAW_TEST_INPUT)), 195)
-    }
+    fn day11b_example() { assert_eq!(day11b(RAW_TEST_INPUT), 195) }
     #[test]
-    fn day11a_real() {
-        assert_eq!(day11a(input_to_octopi(RAW_INPUT), 100), 1686)
-    }
+    fn day11a_real() { assert_eq!(day11a(RAW_INPUT, 100), 1686) }
     #[test]
-    fn day11b_real() { assert_eq!(day11b(input_to_octopi(RAW_INPUT)), 360) }
+    fn day11b_real() { assert_eq!(day11b(RAW_INPUT), 360) }
 }
